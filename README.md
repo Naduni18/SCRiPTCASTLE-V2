@@ -1,6 +1,6 @@
 # AI Test Agent
 
-An Electron desktop app powered by Claude AI that automatically generates test cases, scaffolds a Cypress framework, writes automation scripts, self-heals fragile locators, and analyzes test failures with AI root cause analysis — all from a requirements document, organized by module for any scale of web application.
+An Electron desktop app powered by Claude AI that automatically generates test cases, scaffolds a Cypress or Playwright framework, writes automation scripts, self-heals fragile locators, and analyzes test failures with AI root cause analysis — all from a requirements document, organized by module for any scale of web application.
 
 ---
 
@@ -8,22 +8,23 @@ An Electron desktop app powered by Claude AI that automatically generates test c
 
 | # | Feature | Description |
 |---|---------|-------------|
-| 1 | **Generate Test Cases** | Reads your requirements and produces structured TC-N test cases (UI + API) per module |
-| 2 | **Create Cypress Framework** | Scaffolds a full Cypress 13 project with page objects, custom commands, fixtures, and a self-heal utility |
-| 3 | **Generate Test Scripts** | Converts test cases into runnable `.cy.js` spec files organized by module |
-| 4 | **Self-Heal Locators** | Audits selectors that are genuinely broken or likely to break, and proposes a `data-cy → aria → text → CSS` fallback chain — stable selectors (including IDs) are left untouched |
-| 5 | **Re-run Self-Heal** | Re-runs only the self-heal phase after agent completion or when loading a saved session, without re-generating test cases or scripts |
-| 6 | **Add New Requirements** | Append new modules to an already-completed run — upload or paste new requirements and the agent generates test cases, framework files, and scripts for only the new modules, without touching existing output |
-| 7 | **AI Failure Analyzer** | Injected into every generated framework — reads Cypress results JSON, calls the AI API, and writes a root-cause analysis report to disk |
-| 8 | **GitHub Actions Integration** | Every generated framework includes a workflow that runs Cypress on push/PR, triggers the failure analyzer automatically, and posts the analysis as a PR comment |
-| 9 | **Module-based Pipeline** | Runs the full pipeline per module — handles enterprise apps with thousands of test cases |
-| 10 | **Select & Regenerate TCs** | Pick specific test cases to regenerate scripts for, with AI-assisted selection |
-| 11 | **Upload Requirements** | Upload `.txt`, `.md`, `.pdf`, or `.docx` requirement files directly |
-| 12 | **Export to Excel** | Download all generated test cases as a `.xlsx` file that opens natively in Excel |
-| 13 | **Bug Fix Chat** | Built-in AI chat with full code context to fix errors in generated scripts |
-| 14 | **Session Save / Load** | Save your entire run (results + chat history) to disk and reload it later |
-| 15 | **Extract Files** | Writes all generated framework files directly to a folder on your disk |
-| 16 | **Multi-provider Support** | Switch between Claude (Anthropic) and OpenAI models from the sidebar |
+| 1 | **Choose Your Framework** | Switch between Cypress and Playwright from the sidebar — every generated file, prompt, and script adapts automatically |
+| 2 | **Generate Test Cases** | Reads your requirements and produces structured TC-N test cases (UI + API) per module |
+| 3 | **Create Test Framework** | Scaffolds a full Cypress 13 or Playwright Test project with page objects, custom commands/helpers, fixtures, and a self-heal utility |
+| 4 | **Generate Test Scripts** | Converts test cases into runnable spec files (`.cy.js` for Cypress, `.spec.js` for Playwright) organized by module |
+| 5 | **Self-Heal Locators** | Audits selectors that are genuinely broken or likely to break, and proposes a fallback chain (`data-cy`/`data-testid` → `aria` → `text` → `CSS`) — stable selectors (including IDs) are left untouched |
+| 6 | **Re-run Self-Heal** | Re-runs only the self-heal phase after agent completion or when loading a saved session, without re-generating test cases or scripts |
+| 7 | **Add New Requirements** | Append new modules to an already-completed run — upload or paste new requirements and the agent generates test cases, framework files, and scripts for only the new modules, without touching existing output |
+| 8 | **AI Failure Analyzer** | Injected into every generated framework — reads test results (Cypress or Playwright JSON, auto-detected), calls the AI API, and writes a root-cause analysis report to disk |
+| 9 | **GitHub Actions Integration** | Every generated framework includes a workflow tailored to its framework that runs tests on push/PR, triggers the failure analyzer automatically, and posts the analysis as a PR comment |
+| 10 | **Module-based Pipeline** | Runs the full pipeline per module — handles enterprise apps with thousands of test cases |
+| 11 | **Select & Regenerate TCs** | Pick specific test cases to regenerate scripts for, with AI-assisted selection |
+| 12 | **Upload Requirements** | Upload `.txt`, `.md`, `.pdf`, or `.docx` requirement files directly |
+| 13 | **Export to Excel** | Download all generated test cases as a `.xlsx` file that opens natively in Excel |
+| 14 | **Bug Fix Chat** | Built-in AI chat with full code context to fix errors in generated scripts |
+| 15 | **Session Save / Load** | Save your entire run (results + chat history) to disk and reload it later |
+| 16 | **Extract Files** | Writes all generated framework files directly to a folder on your disk |
+| 17 | **Multi-provider Support** | Switch between Claude (Anthropic) and OpenAI models from the sidebar |
 
 ---
 
@@ -99,9 +100,12 @@ npm start
 | AI Provider | Choose Claude (Anthropic) or OpenAI |
 | API Key | Your key from [console.anthropic.com](https://console.anthropic.com) or [platform.openai.com](https://platform.openai.com) |
 | Model | Select the model — Sonnet 4.6 is recommended for the best speed/quality balance |
+| Test Framework | Choose **Cypress** or **Playwright** — this determines every file path, prompt, and config generated for the rest of the run |
 | Base URL | The URL of the web app you are testing, e.g. `https://myapp.com` |
 | Modules | One module name per line, e.g. `Authentication`, `Shopping Cart`, `Checkout` |
 | Requirements | Upload a `.txt` / `.md` / `.pdf` / `.docx` file, or paste text directly |
+
+> **Switching frameworks mid-project:** the Test Framework picker only affects what gets generated going forward. If you change it after a run is already in progress, finish or restart the run first — switching frameworks between an initial run and an **Add New Requirements** append on the same project is not supported, since the two frameworks have incompatible file layouts.
 
 ### Step 2 — Run the agent
 
@@ -109,13 +113,17 @@ Click **Run Agent**. You will be prompted to pick an output folder, then the pip
 
 ```
 Once (shared):
-  └── Generate shared config files (package.json, cypress.config.js, commands.js,
-      selfHeal.js, .env.example, README.md, AI Failure Analyzer scripts,
-      GitHub Actions workflow)
+  └── Generate shared config files for the selected framework:
+      Cypress    → package.json, cypress.config.js, cypress/support/commands.js,
+                   cypress/utils/selfHeal.js, .env.example, README.md,
+                   AI Failure Analyzer scripts, GitHub Actions workflow
+      Playwright → package.json, playwright.config.js, support/globalSetup.js,
+                   support/commands.js, utils/selfHeal.js, .env.example, README.md,
+                   AI Failure Analyzer scripts, GitHub Actions workflow
 
 For each module:
   ├── Phase 1 — Generate up to 50 test cases
-  ├── Phase 2 — Generate page objects, fixtures, and custom commands
+  ├── Phase 2 — Generate page objects, fixtures, and custom commands/helpers
   ├── Phase 3 — Generate spec files (happy-path + edge-cases)
   ├── Phase 4 — Self-heal locators (broken/fragile selectors only)
   └── Write all files to disk immediately
@@ -126,15 +134,15 @@ For each module:
 Use the four tabs to review generated content:
 
 - **Test Cases** — collapsible cards, tagged UI or API, with module headers
-- **Framework** — full Cypress project scaffold with all config files
-- **Test Scripts** — runnable `.cy.js` spec files per module
+- **Framework** — full project scaffold with all config files for the selected framework
+- **Test Scripts** — runnable spec files per module (`.cy.js` or `.spec.js`)
 - **Self-Heal** — colour-coded locator audit (STALE / REASON / HEALED / STRATEGY)
 
 ### Step 4 — Re-run self-heal (optional)
 
 After the agent completes, a **Re-run Self-Heal** button appears. Click it to re-analyze the existing scripts and regenerate the self-heal report without touching test cases or scripts. This also appears when loading a saved session that contains scripts.
 
-> **Self-heal policy:** Only selectors that are genuinely broken or highly likely to break are flagged (e.g. auto-generated IDs, `nth-child` indexes, volatile class names, deeply nested chains). Stable selectors — including meaningful IDs — are left untouched.
+> **Self-heal policy:** Only selectors that are genuinely broken or highly likely to break are flagged (e.g. auto-generated IDs, `nth-child` indexes, volatile class names, deeply nested chains). Stable selectors — including meaningful IDs — are left untouched. The healing chain target differs by framework: Cypress prefers `data-cy`, Playwright prefers `data-testid`.
 
 ### Step 5 — Add new requirements (optional)
 
@@ -145,7 +153,7 @@ Once a run is complete, an **Add New Requirements** button appears next to the E
 3. Upload a new requirements document, or paste the new requirements text
 4. Click **Generate & Append**
 
-The agent runs the full per-module pipeline (test cases → framework → scripts → self-heal) for only the new modules and appends the results to all four panels. Existing test cases, framework files, scripts, and self-heal reports are never overwritten. If an output folder was already chosen for the run, new files are written there automatically. New module names are also added to the sidebar **Modules** field so they're included in any future Extract or Re-run Self-Heal actions.
+The agent runs the full per-module pipeline (test cases → framework → scripts → self-heal) for only the new modules, using the same framework as the original run, and appends the results to all four panels. Existing test cases, framework files, scripts, and self-heal reports are never overwritten. If an output folder was already chosen for the run, new files are written there automatically. New module names are also added to the sidebar **Modules** field so they're included in any future Extract or Re-run Self-Heal actions.
 
 ### Step 6 — Export
 
@@ -154,7 +162,7 @@ The agent runs the full per-module pipeline (test cases → framework → script
 | **Extract Framework** | Opens a folder picker and writes all framework + script files to disk |
 | **Download Test Cases as Excel** | Saves a `.xlsx` with columns: ID, Type, Title, Preconditions, Steps, Expected Result, Priority |
 | **Copy** | Copies the current tab's raw output to clipboard |
-| **Save** | Saves the current tab's raw output as a file |
+| **Save** | Saves the current tab's raw output as a file (named `cypress-framework.md` or `playwright-framework.md` depending on the active framework) |
 
 ### Step 7 — Fix bugs with AI chat
 
@@ -168,7 +176,9 @@ Use **Save** / **Load** in the session bar (bottom of the sidebar) to persist yo
 
 ## Generated project structure
 
-After running the agent for a 3-module site, your output folder will look like:
+### Cypress
+
+After running the agent for a 3-module site with Cypress selected, your output folder looks like:
 
 ```
 output-folder/
@@ -189,12 +199,9 @@ output-folder/
 │   ├── utils/
 │   │   └── selfHeal.js
 │   ├── pages/
-│   │   ├── Authentication/
-│   │   │   └── index.js
-│   │   ├── ShoppingCart/
-│   │   │   └── index.js
-│   │   └── Checkout/
-│   │       └── index.js
+│   │   ├── Authentication/index.js
+│   │   ├── ShoppingCart/index.js
+│   │   └── Checkout/index.js
 │   ├── fixtures/
 │   │   ├── authentication.json
 │   │   ├── shopping-cart.json
@@ -217,31 +224,78 @@ output-folder/
 │       └── failure-analysis.md        ← Written by AI analyzer after a run
 ```
 
-After using **Add New Requirements** to add e.g. a `Wishlist` module, new files are written alongside the existing ones without disturbing them:
+### Playwright
+
+The same 3-module site with Playwright selected produces:
 
 ```
 output-folder/
-├── cypress/
-│   ├── pages/
-│   │   ├── Authentication/ ...        ← unchanged
-│   │   ├── ShoppingCart/   ...        ← unchanged
-│   │   ├── Checkout/       ...        ← unchanged
-│   │   └── Wishlist/                  ← new
-│   │       └── index.js
-│   ├── e2e/
-│   │   ├── authentication/ ...        ← unchanged
-│   │   ├── shopping-cart/  ...        ← unchanged
-│   │   ├── checkout/       ...        ← unchanged
-│   │   └── wishlist/                  ← new
-│   │       ├── happy-path.cy.js
-│   │       └── edge-cases.cy.js
-│   └── fixtures/
-│       └── wishlist.json              ← new
+├── package.json
+├── playwright.config.js               ← JSON reporter pre-configured
+├── .env.example
+├── README.md
+├── scripts/
+│   ├── analyze-failures.js            ← AI root cause analyzer (Node.js, framework-agnostic)
+│   └── analyze-failures-local.sh      ← One-command local runner
+├── .github/
+│   └── workflows/
+│       └── ai-failure-analysis.yml    ← GitHub Actions workflow (Playwright variant)
+├── support/
+│   ├── globalSetup.js                 ← Auth/login state setup
+│   └── commands.js
+├── utils/
+│   └── selfHeal.js
+├── pages/
+│   ├── Authentication/index.js
+│   ├── ShoppingCart/index.js
+│   └── Checkout/index.js
+├── fixtures/
+│   ├── authentication.json
+│   ├── shopping-cart.json
+│   └── checkout.json
+├── tests/
+│   ├── authentication/
+│   │   ├── happy-path.spec.js
+│   │   └── edge-cases.spec.js
+│   ├── shopping-cart/
+│   │   ├── happy-path.spec.js
+│   │   └── edge-cases.spec.js
+│   └── checkout/
+│       ├── happy-path.spec.js
+│       └── edge-cases.spec.js
+└── playwright-report/
+    ├── results.json                   ← Written by Playwright after a run
+    └── failure-analysis.md            ← Written by AI analyzer after a run
+```
+
+### Appending new modules
+
+After using **Add New Requirements** to add e.g. a `Wishlist` module, new files are written alongside the existing ones for whichever framework the project was created with, without disturbing anything already generated. Example for a Playwright project:
+
+```
+output-folder/
+├── pages/
+│   ├── Authentication/ ...  ← unchanged
+│   ├── ShoppingCart/   ...  ← unchanged
+│   ├── Checkout/       ...  ← unchanged
+│   └── Wishlist/             ← new
+│       └── index.js
+├── tests/
+│   ├── authentication/ ...  ← unchanged
+│   ├── shopping-cart/  ...  ← unchanged
+│   ├── checkout/       ...  ← unchanged
+│   └── wishlist/             ← new
+│       ├── happy-path.spec.js
+│       └── edge-cases.spec.js
+└── fixtures/
+    └── wishlist.json         ← new
 ```
 
 ---
 
-## Run the generated Cypress tests
+## Run the generated tests
+
+### Cypress
 
 ```bash
 cd output-folder
@@ -257,11 +311,28 @@ npx cypress run
 npx cypress run --spec "cypress/e2e/authentication/**"
 ```
 
+### Playwright
+
+```bash
+cd output-folder
+npm install
+npx playwright install --with-deps   # download browser binaries (first time only)
+
+# Open Playwright's interactive UI mode
+npx playwright test --ui
+
+# Run all tests headlessly (also writes results.json for the analyzer)
+npx playwright test
+
+# Run a specific module
+npx playwright test tests/authentication
+```
+
 ---
 
 ## AI Failure Analyzer
 
-Every generated framework includes a root-cause analyzer that reads Cypress results and uses AI to explain each failure, categorize it, and suggest a concrete fix.
+Every generated framework — Cypress or Playwright — includes a root-cause analyzer that reads test results and uses AI to explain each failure, categorize it, and suggest a concrete fix. The analyzer auto-detects which JSON shape it's reading (Cypress/Mocha vs Playwright) so the same script works for either framework.
 
 ### Run locally
 
@@ -271,11 +342,11 @@ cd output-folder
 # Set your Anthropic API key
 export ANTHROPIC_API_KEY=sk-ant-your-key-here
 
-# Run the analyzer (runs Cypress first if no results.json exists yet)
+# Run the analyzer (runs the test suite first if no results.json exists yet)
 bash scripts/analyze-failures-local.sh
 ```
 
-The report is saved to `cypress/reports/failure-analysis.md`. A preview is also printed to the terminal.
+The report is saved to `cypress/reports/failure-analysis.md` (Cypress) or `playwright-report/failure-analysis.md` (Playwright). A preview is also printed to the terminal.
 
 ### What the report contains
 
@@ -290,12 +361,13 @@ For every failing test, the analyzer outputs:
 
 ### Run via GitHub Actions
 
-The included `.github/workflows/ai-failure-analysis.yml` workflow:
+The included `.github/workflows/ai-failure-analysis.yml` workflow is generated to match the framework you chose. Both variants:
 
-1. Runs `npm ci` and all Cypress tests on every push to `main`/`develop` and on every pull request
-2. Automatically runs the AI failure analyzer after the test run (even if tests fail)
-3. Uploads `results.json`, `failure-analysis.md`, screenshots, and videos as downloadable artifacts (retained for 14 days)
-4. Posts the full failure analysis as a comment on pull requests
+1. Run `npm ci`, and for Playwright also `npx playwright install --with-deps`
+2. Run the full test suite on every push to `main`/`develop` and on every pull request
+3. Automatically run the AI failure analyzer after the test run (even if tests fail)
+4. Upload the results JSON, the failure analysis report, and any screenshots/videos/traces as downloadable artifacts (retained for 14 days)
+5. Post the full failure analysis as a comment on pull requests
 
 **Setup — add these secrets/variables in your GitHub repository settings:**
 
@@ -308,7 +380,7 @@ The included `.github/workflows/ai-failure-analysis.yml` workflow:
 
 Then push your framework to GitHub — the workflow triggers automatically.
 
-**Manual trigger:** Go to Actions → "Cypress + AI Failure Analysis" → Run workflow.
+**Manual trigger:** Go to Actions → "Cypress + AI Failure Analysis" (or "Playwright + AI Failure Analysis") → Run workflow.
 
 ---
 
@@ -321,7 +393,7 @@ Then push your framework to GitHub — the workflow triggers automatically.
 | Large eCommerce | 8–12 | ~40 | ~85–125 |
 | Enterprise (100+ pages) | 15–25 | ~80 | ~155–260 |
 
-Each module generates up to 50 test cases and 5–7 files within the 8,000 token output limit. Modules added later via **Add New Requirements** follow the same per-module cost.
+Each module generates up to 50 test cases and 5–7 files within the 8,000 token output limit, regardless of which framework is selected. Modules added later via **Add New Requirements** follow the same per-module cost.
 
 ---
 
@@ -366,7 +438,7 @@ Built files are output to the `dist/` folder.
 | Variable | Description |
 |----------|-------------|
 | `ANTHROPIC_API_KEY` | Used by the AI failure analyzer script |
-| `BASE_URL` | The app under test — also set as `CYPRESS_BASE_URL` |
+| `BASE_URL` | The app under test (set as `CYPRESS_BASE_URL` for Cypress, `BASE_URL` for Playwright) |
 | `USERNAME` | Test user email |
 | `PASSWORD` | Test user password |
 | `API_KEY` | API key for the app under test |
@@ -380,6 +452,8 @@ Built files are output to the `dist/` folder.
 |-----------|---------|---------|
 | [Electron](https://www.electronjs.org/) | v28 | Desktop shell, file system access, IPC |
 | [Claude API](https://docs.anthropic.com/) | claude-sonnet-4-6 | AI backbone for all pipeline phases and failure analysis |
+| [Cypress](https://www.cypress.io/) | v13 | Generated test framework option #1 |
+| [Playwright](https://playwright.dev/) | latest (`@playwright/test`) | Generated test framework option #2 |
 | [electron-builder](https://www.electron.build/) | v24 | Cross-platform packaging (.exe, .dmg, .AppImage) |
 | [mammoth](https://github.com/mwilliamson/mammoth.js) | v1.6 | DOCX text extraction |
 | Vanilla HTML/CSS/JS | — | Zero frontend framework, zero bundle step |
@@ -402,10 +476,12 @@ Built files are output to the `dist/` folder.
 | Re-run Self-Heal button missing | It only appears after agent completes or when a session with scripts is loaded — check that Panel 2 (Test Scripts) has content |
 | Add New Requirements button missing | Same gating as Re-run Self-Heal — requires an existing run or a loaded session with scripts |
 | "Module already exists" toast | The new module name matches one already in the sidebar Modules field — rename it or remove the old one first |
+| Clicking Playwright/Cypress hides the API key field | Make sure the AI Provider tab click handler is scoped to `#providerTabs .provider-tab`, not the unscoped `.provider-tab` selector — otherwise clicking a framework tab also fires the provider-switch logic and hides the wrong section |
 | Failure analyzer: `ANTHROPIC_API_KEY is not set` | Run `export ANTHROPIC_API_KEY=sk-ant-...` before running the analyzer script |
-| Failure analyzer: `No results file found` | Run `npx cypress run` first, or use `bash scripts/analyze-failures-local.sh` which runs Cypress automatically |
+| Failure analyzer: `No results file found` | Run the test suite first (`npx cypress run` or `npx playwright test`), or use `bash scripts/analyze-failures-local.sh` which runs it automatically |
 | GitHub Actions: analyzer step skipped | Ensure `ANTHROPIC_API_KEY` is added as a repository secret (Settings → Secrets → Actions) |
 | GitHub Actions: PR comment not posted | The workflow needs `issues: write` and `pull-requests: write` permissions — check your repository Actions permissions settings |
+| Playwright JSON results look corrupted | Prefer the `reporter` config option (`['json', { outputFile: ... }]`) over shell-redirecting stdout — some Playwright versions print extra non-JSON output to stdout that breaks a naive `> results.json` redirect |
 
 ---
 
