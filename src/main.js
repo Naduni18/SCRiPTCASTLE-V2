@@ -12,7 +12,7 @@ app.whenReady().then(() => {
     height: 800,
     minWidth: 900,
     minHeight: 600,
-    title: 'AI Test Agent',
+    title: 'SCRiPTCASTLE',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -200,7 +200,7 @@ ipcMain.handle('generate-excel', async (_, { rows }) => {
     const ExcelJS = require('exceljs');
     const wb      = new ExcelJS.Workbook();
 
-    wb.creator  = 'AI Test Agent';
+    wb.creator  = 'SCRiPTCASTLE';
     wb.created  = new Date();
 
     // ── Colours ──────────────────────────────────────────────────────────
@@ -370,7 +370,7 @@ ipcMain.handle('generate-excel', async (_, { rows }) => {
 
     ws2.mergeCells('A2:D2');
     const subTitle = ws2.getCell('A2');
-    subTitle.value     = `AI Test Agent  •  ${rows.length} test cases generated`;
+    subTitle.value     = `SCRiPTCASTLE  •  ${rows.length} test cases generated`;
     subTitle.font      = { name: 'Arial', italic: true, size: 10, color: { argb: '888888' } };
     subTitle.alignment = { horizontal: 'center' };
     ws2.getRow(2).height = 20;
@@ -618,7 +618,7 @@ t.alignment = Alignment(horizontal="center", vertical="center")
 ws2.row_dimensions[1].height = 40
 
 ws2.merge_cells("A2:D2")
-ws2["A2"].value = f"AI Test Agent  •  Total: {total} test cases"
+ws2["A2"].value = f"SCRiPTCASTLE  •  Total: {total} test cases"
 ws2["A2"].font  = Font(name="Arial", italic=True, size=10, color="888888")
 ws2["A2"].alignment = Alignment(horizontal="center")
 ws2.row_dimensions[2].height = 20

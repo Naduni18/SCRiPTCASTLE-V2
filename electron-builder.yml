@@ -1,5 +1,5 @@
 appId: com.yourco.ai-test-agent
-productName: AI Test Agent
+productName: SCRiPTCASTLE
 directories:
   output: dist
 files:

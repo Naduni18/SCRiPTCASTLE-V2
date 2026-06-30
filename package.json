@@ -1,5 +1,5 @@
 {
-  "name": "ai-test-agent",
+  "name": "scriptcastle",
   "version": "1.0.0",
   "description": "AI-powered test generation agent",
   "main": "src/main.js",

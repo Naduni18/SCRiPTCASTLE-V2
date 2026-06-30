@@ -1,4 +1,4 @@
-# AI Test Agent
+# SCRiPTCASTLE
 
 An Electron desktop app powered by Claude AI that automatically generates test cases, scaffolds a Cypress or Playwright framework, writes automation scripts, self-heals fragile locators, and analyzes test failures with AI root cause analysis — all from a requirements document, organized by module for any scale of web application.
 
@@ -400,13 +400,13 @@ Each module generates up to 50 test cases and 5–7 files within the 8,000 token
 ## Build standalone executables
 
 ```bash
-# Windows — produces dist/AI Test Agent Setup.exe
+# Windows — produces dist/SCRiPTCASTLE Setup.exe
 npm run build:win
 
-# macOS — produces dist/AI Test Agent.dmg
+# macOS — produces dist/SCRiPTCASTLE.dmg
 npm run build:mac
 
-# Linux — produces dist/AI Test Agent.AppImage
+# Linux — produces dist/SCRiPTCASTLE.AppImage
 npm run build:linux
 
 # All platforms at once
@@ -423,7 +423,7 @@ Built files are output to the `dist/` folder.
 
 ## Environment variables
 
-### AI Test Agent app
+### SCRiPTCASTLE app
 
 | Variable | Description |
 |----------|-------------|
