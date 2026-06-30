@@ -41,6 +41,8 @@ jobs:
 
       - name: Build (${{ matrix.os }})
         run: ${{ matrix.build_cmd }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
