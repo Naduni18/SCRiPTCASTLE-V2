@@ -3,6 +3,8 @@ const { execSync, spawnSync } = require('child_process');
 const os   = require('os');
 const path = require('path');
 const fs = require('fs');
+const { Menu } = require('electron');
+const pkg = require('../package.json');
 
 let win;
 
@@ -19,6 +21,79 @@ app.whenReady().then(() => {
       nodeIntegration: false
     }
   });
+
+  // ── Application menu with Help → About ──────────────────
+  const isMac = process.platform === 'darwin';
+
+  const aboutWindow = () => {
+    dialog.showMessageBox(win, {
+      type: 'info',
+      title: 'About SCRiPTCASTLE',
+      message: 'SCRiPTCASTLE',
+      detail:
+        `Version: ${pkg.version}\n` +
+        `License: ${pkg.license || 'Unspecified'}\n` +
+        `Electron: ${process.versions.electron}\n` +
+        `Node: ${process.versions.node}\n` +
+        `Chromium: ${process.versions.chrome}\n\n` +
+        `${pkg.description || ''}\n\n` +
+        `© ${new Date().getFullYear()} Naduni18`,
+      buttons: ['OK'],
+      noLink: true
+    });
+  };
+
+  const menuTemplate = [
+    ...(isMac ? [{
+      label: app.name,
+      submenu: [
+        { label: 'About SCRiPTCASTLE', click: aboutWindow },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    }] : []),
+    {
+      label: 'File',
+      submenu: [
+        isMac ? { role: 'close' } : { role: 'quit' }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' }, { role: 'redo' }, { type: 'separator' },
+        { role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' }, { role: 'forceReload' }, { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' }, { role: 'zoomIn' }, { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    {
+      label: 'Help',
+      submenu: [
+        ...(isMac ? [] : [{ label: 'About SCRiPTCASTLE', click: aboutWindow }]),
+        {
+          label: 'View on GitHub',
+          click: () => require('electron').shell.openExternal('https://github.com/Naduni18/SCRiPTCASTLE-V2')
+        }
+      ]
+    }
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
 
   // Fix CSP — allow inline styles and all connections
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
