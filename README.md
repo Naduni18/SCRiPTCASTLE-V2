@@ -397,7 +397,7 @@ Each module generates up to 50 test cases and 5–7 files within the 8,000 token
 
 ---
 
-## Build standalone executables
+## Build standalone executables.
 
 ```bash
 # Windows — produces dist/SCRiPTCASTLE Setup.exe
