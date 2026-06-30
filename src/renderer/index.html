@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' 'unsafe-inline'; connect-src *; font-src * data:;" />
+    <title>AI Test Agent</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- ── Sidebar ─────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="currentColor" stroke-width="1.5"
+                            stroke-linejoin="round" />
+                        <path d="M10 2v12M3 6l7 4 7-4" stroke="currentColor" stroke-width="1.5"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <span class="logo-name">AI Test Agent</span>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Collapse sidebar">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="sidebar-body">
+
+            <!-- Config fields -->
+            <section class="config-section">
+                <h2 class="section-label">Configuration</h2>
+
+                <!-- ── Provider picker ──────────────────────────────────── -->
+                <div class="field">
+                    <label class="field-label">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3" />
+                            <path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        AI Provider
+                    </label>
+                    <div class="provider-tabs" id="providerTabs">
+                        <button class="provider-tab active" data-provider="anthropic" id="tabAnthropic">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M12 2L2 19h20L12 2z" stroke="currentColor" stroke-width="1.6"
+                                    stroke-linejoin="round" />
+                                <path d="M12 8v6M12 17v.5" stroke="currentColor" stroke-width="1.6"
+                                    stroke-linecap="round" />
+                            </svg>
+                            Claude
+                        </button>
+                        <button class="provider-tab" data-provider="openai" id="tabOpenAI">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.6" />
+                                <path d="M8 12a4 4 0 0 1 8 0" stroke="currentColor" stroke-width="1.6"
+                                    stroke-linecap="round" />
+                                <circle cx="12" cy="15" r="1.5" fill="currentColor" />
+                            </svg>
+                            OpenAI
+                        </button>
+                    </div>
+                    
+                </div>
+
+                <!-- ── Test Framework picker ────────────────────────────── -->
+                <div class="field">
+                    <label class="field-label">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M2 3h5v5H2zM9 3h5v5H9zM2 10h5v5H2zM9 10h5v5H9z" stroke="currentColor"
+                                stroke-width="1.3" stroke-linejoin="round" />
+                        </svg>
+                        Test Framework
+                    </label>
+                    <div class="provider-tabs" id="frameworkTabs">
+                        <button class="provider-tab active" data-framework="cypress" id="tabCypress">
+                            Cypress
+                        </button>
+                        <button class="provider-tab" data-framework="playwright" id="tabPlaywright">
+                            Playwright
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Claude / Anthropic fields ────────────────────────── -->
+                <div class="provider-section" id="sectionAnthropic">
+                    <div class="field">
+                        <label for="apiKey" class="field-label">
+                            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M11 1a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM7.22 9.78 2 15" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M4 13l1.5 1.5" stroke="currentColor" stroke-width="1.5"
+                                    stroke-linecap="round" />
+                            </svg>
+                            Anthropic API Key
+                        </label>
+                        <div class="input-wrap">
+                            <input type="password" id="apiKey" class="field-input" placeholder="sk-ant-api03-…"
+                                autocomplete="off" spellcheck="false" />
+                            <button class="input-toggle" id="toggleKey" aria-label="Show key" tabindex="-1">
+                                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                    <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor"
+                                        stroke-width="1.3" />
+                                    <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="claudeModel" class="field-label">
+                            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <rect x="1" y="4" width="14" height="8" rx="2" stroke="currentColor"
+                                    stroke-width="1.3" />
+                                <path d="M4 8h8M4 10h5" stroke="currentColor" stroke-width="1.3"
+                                    stroke-linecap="round" />
+                            </svg>
+                            Model
+                        </label>
+                        <select id="claudeModel" class="field-input">
+                            <optgroup label="Claude 4">
+                                <option value="claude-opus-4-6">Claude Opus 4.6 (most capable)</option>
+                                <option value="claude-sonnet-4-6" selected>Claude Sonnet 4.6 (recommended)</option>
+                            </optgroup>
+                            <optgroup label="Claude 3.7">
+                                <option value="claude-sonnet-3-7">Claude Sonnet 3.7</option>
+                            </optgroup>
+                            <optgroup label="Claude 3.5">
+                                <option value="claude-sonnet-3-5">Claude Sonnet 3.5</option>
+                                <option value="claude-haiku-3-5">Claude Haiku 3.5 (fastest)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="model-hint" id="claudeModelHint">
+                        <span id="claudeModelDesc">Best balance of speed and quality</span>
+                    </div>
+                    <div class="provider-hint">
+                        Get your key at
+                        <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer"
+                            class="provider-link">console.anthropic.com</a>
+                    </div>
+                </div>
+
+                <!-- ── OpenAI fields ─────────────────────────────────────── -->
+                <div class="provider-section" id="sectionOpenAI" hidden>
+                    <div class="field">
+                        <label for="openaiKey" class="field-label">
+                            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M11 1a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM7.22 9.78 2 15" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M4 13l1.5 1.5" stroke="currentColor" stroke-width="1.5"
+                                    stroke-linecap="round" />
+                            </svg>
+                            OpenAI API Key
+                        </label>
+                        <div class="input-wrap">
+                            <input type="password" id="openaiKey" class="field-input" placeholder="sk-proj-…"
+                                autocomplete="off" spellcheck="false" />
+                            <button class="input-toggle" id="toggleOpenAIKey" aria-label="Show key" tabindex="-1">
+                                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                    <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor"
+                                        stroke-width="1.3" />
+                                    <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="openaiModel" class="field-label">
+                            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <rect x="1" y="4" width="14" height="8" rx="2" stroke="currentColor"
+                                    stroke-width="1.3" />
+                                <path d="M4 8h8M4 10h5" stroke="currentColor" stroke-width="1.3"
+                                    stroke-linecap="round" />
+                            </svg>
+                            Model
+                        </label>
+                        <select id="openaiModel" class="field-input">
+                            <option value="gpt-4o">gpt-4o</option>
+                            <option value="gpt-4o-mini">gpt-4o-mini (faster)</option>
+                            <option value="gpt-4-turbo">gpt-4-turbo</option>
+                            <option value="gpt-4">gpt-4</option>
+                            <option value="o1-preview">o1-preview</option>
+                            <option value="o1-mini">o1-mini</option>
+                        </select>
+                    </div>
+                    <div class="provider-hint">
+                        Get your key at
+                        <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer"
+                            class="provider-link openai">platform.openai.com</a>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="baseUrl" class="field-label">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3" />
+                            <path d="M8 1.5C6 4 5 6 5 8s1 4 3 6.5M8 1.5C10 4 11 6 11 8s-1 4-3 6.5M1.5 8h13"
+                                stroke="currentColor" stroke-width="1.3" />
+                        </svg>
+                        Application Base URL
+                    </label>
+                    <input type="url" id="baseUrl" class="field-input" placeholder="https://your-app.com"
+                        spellcheck="false" />
+                </div>
+                <div class="field">
+                    <label for="modules" class="field-label">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3" />
+                            <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3" />
+                            <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3" />
+                            <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3" />
+                        </svg>
+                        Modules (one per line)
+                    </label>
+                    <textarea id="modules" class="field-input field-textarea"
+                        placeholder="Authentication&#10;Product Catalog&#10;Shopping Cart&#10;Checkout&#10;User Profile"
+                        style="height:80px" spellcheck="false"></textarea>
+                </div>
+                <div class="field">
+                    <label class="field-label">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.3" />
+                            <path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.3"
+                                stroke-linecap="round" />
+                        </svg>
+                        Requirements Document
+                    </label>
+
+                    <!-- reqFile must be OUTSIDE uploadZone so its click cannot bubble up to the zone's click handler -->
+                    <input type="file" id="reqFile" accept=".txt,.md,.pdf,.docx,.doc" hidden />
+
+                    <!-- Upload zone -->
+                    <div class="upload-zone" id="uploadZone">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 3v12M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" />
+                        </svg>
+                        <span class="upload-label" id="uploadLabel">Click to upload or drag & drop</span>
+                        <span class="upload-hint">.txt .md .pdf .docx</span>
+                    </div>
+
+                    <!-- File info bar (shown after upload) -->
+                    <div class="upload-info" id="uploadInfo" hidden>
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.3" />
+                            <path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.3"
+                                stroke-linecap="round" />
+                        </svg>
+                        <span id="uploadFileName">file.txt</span>
+                        <span id="uploadFileSize" class="upload-size"></span>
+                        <button class="upload-clear" id="uploadClear" aria-label="Remove file">✕</button>
+                    </div>
+
+                    <!-- Fallback textarea (always available) -->
+                    <textarea id="reqDoc" class="field-input field-textarea" placeholder="Or paste requirements here…"
+                        spellcheck="false" style="margin-top:6px"></textarea>
+                    <div class="char-count" id="charCount">0 characters</div>
+                </div>
+
+                <!-- Excel download button (shown after test cases generated) -->
+                <div class="field" id="excelWrap" hidden>
+                    <button class="excel-btn" id="excelBtn">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <rect x="1" y="1" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.3" />
+                            <path d="M4 5l3 3-3 3M9 11h4" stroke="currentColor" stroke-width="1.4"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        Download Test Cases as Excel
+                    </button>
+                </div>
+                <!-- Add New Requirements (append to existing run) -->
+                <div class="field" id="addReqWrap" hidden>
+                    <button class="action-btn" id="addReqBtn" style="width:100%;justify-content:center">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                        Add New Requirements
+                    </button>
+                </div>
+            </section>
+
+            <!-- Pipeline steps -->
+            <section class="pipeline-section">
+                <h2 class="section-label">Pipeline</h2>
+                <ol class="pipeline-steps" id="pipelineSteps">
+                    <li class="step-item" data-step="0" id="step-0">
+                        <span class="step-dot" aria-hidden="true"></span>
+                        <span class="step-text">Generate test cases</span>
+                        <span class="step-status" id="status-0"></span>
+                    </li>
+                    <li class="step-item" data-step="1" id="step-1">
+                        <span class="step-dot" aria-hidden="true"></span>
+                        <span class="step-text">Create Cypress framework</span>
+                        <span class="step-status" id="status-1"></span>
+                    </li>
+                    <li class="step-item" data-step="2" id="step-2">
+                        <span class="step-dot" aria-hidden="true"></span>
+                        <span class="step-text">Generate test scripts</span>
+                        <span class="step-status" id="status-2"></span>
+                    </li>
+                    <li class="step-item" data-step="3" id="step-3">
+                        <span class="step-dot" aria-hidden="true"></span>
+                        <span class="step-text">Self-heal locators</span>
+                        <span class="step-status" id="status-3"></span>
+                    </li>
+                </ol>
+            </section>
+
+        </div><!-- /sidebar-body -->
+        <!-- ── Session bar ──────────────────────────────────────── -->
+        <div class="session-bar" id="sessionBar">
+            <div class="session-info" id="sessionInfo">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3" />
+                    <path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                <span id="sessionInfoText">No session loaded</span>
+            </div>
+            <div class="session-actions">
+                <button class="session-btn" id="saveSessionBtn" title="Save session to folder" disabled>
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 11v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3
+                 M8 1v8M5 6l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Save
+                </button>
+                <button class="session-btn" id="loadSessionBtn" title="Load session from folder">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 5v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7
+                 M2 5h4l1.5-2H14a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Load
+                </button>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="progress-wrap" id="progressWrap" hidden>
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="progress-label" id="progressLabel">Starting…</span>
+            </div>
+
+            <button class="run-btn" id="runBtn">
+                <svg class="run-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M5 3l8 5-8 5V3z" fill="currentColor" />
+                </svg>
+                <svg class="spin-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"
+                    style="display:none">
+                    <path d="M8 2a6 6 0 1 0 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+                <span class="run-label">Run Agent</span>
+            </button>
+            <!-- Add RIGHT AFTER the runBtn closing tag -->
+<button id="rehealBtn" class="action-btn reheal-btn" hidden>
+  <svg class="run-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
+    <path d="M13.5 8A5.5 5.5 0 1 1 8 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M13.5 2.5v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span class="run-label">Re-run Self-Heal</span>
+  <svg class="spin-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" style="display:none">
+    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="10"/>
+  </svg>
+</button>
+        </div>
+
+    </aside>
+
+    <!-- ── Main panel ──────────────────────────────────────────── -->
+    <main class="main" id="main">
+
+        <header class="topbar">
+            <nav class="tabs" role="tablist" aria-label="Output phases">
+                <button class="tab active" role="tab" aria-selected="true" aria-controls="panel-0" id="tab-0"
+                    data-tab="0">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M3 4h10M3 8h7M3 12h5" stroke="currentColor" stroke-width="1.4"
+                            stroke-linecap="round" />
+                    </svg>
+                    Test Cases
+                </button>
+                <button class="tab" role="tab" aria-selected="false" aria-controls="panel-1" id="tab-1" data-tab="1">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 3h5v5H2zM9 3h5v5H9zM2 10h5v5H2zM9 10h5v5H9z" stroke="currentColor"
+                            stroke-width="1.3" stroke-linejoin="round" />
+                    </svg>
+                    Framework
+                </button>
+                <button class="tab" role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2" data-tab="2">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M5 5L2 8l3 3M11 5l3 3-3 3M9 3L7 13" stroke="currentColor" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Test Scripts
+                </button>
+                <button class="tab" role="tab" aria-selected="false" aria-controls="panel-3" id="tab-3" data-tab="3">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M8 1v3M8 12v3M1 8h3M12 8h3" stroke="currentColor" stroke-width="1.4"
+                            stroke-linecap="round" />
+                        <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3" />
+                    </svg>
+                    Self-Heal
+                </button>
+            </nav>
+
+            <div class="topbar-actions">
+                <button class="action-btn" id="selectTCBtn" title="Select test cases to automate" disabled>
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.4"
+                            stroke-linecap="round" />
+                        <circle cx="13" cy="12" r="2.5" stroke="currentColor" stroke-width="1.3" />
+                        <path d="M12 12l.8.8 1.5-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Select TCs
+                </button>
+                <button class="action-btn" id="copyBtn" title="Copy output" disabled>
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3" />
+                        <path d="M3 11H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1" stroke="currentColor"
+                            stroke-width="1.3" />
+                    </svg>
+                    Copy
+                </button>
+                <button class="action-btn" id="saveBtn" title="Save to file" disabled>
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M8 1v8M5 6l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M2 11v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3" stroke="currentColor" stroke-width="1.3"
+                            stroke-linecap="round" />
+                    </svg>
+                    Save
+                </button>
+                <button class="action-btn" id="extractBtn" title="Write all files to a folder" disabled>
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 11v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3M8 1v8M5 6l3 3 3-3" stroke="currentColor"
+                            stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Extract Framework
+                </button>
+            </div>
+        </header>
+
+        <!-- Output panels -->
+        <div class="panels">
+
+            <!-- Panel 0: Test Cases -->
+            <div class="panel active" role="tabpanel" id="panel-0" aria-labelledby="tab-0">
+                <div class="empty-state" id="empty-0">
+                    <div class="empty-icon" aria-hidden="true">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <rect x="6" y="4" width="28" height="32" rx="3" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M12 13h16M12 19h12M12 25h8" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <p class="empty-title">No test cases yet</p>
+                    <p class="empty-desc">Enter your requirements and run the agent to generate structured test cases.
+                    </p>
+                </div>
+                <div class="panel-content" id="content-0" hidden></div>
+            </div>
+
+            <!-- Panel 1: Framework -->
+            <div class="panel" role="tabpanel" id="panel-1" aria-labelledby="tab-1" hidden>
+                <div class="empty-state" id="empty-1">
+                    <div class="empty-icon" aria-hidden="true">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <rect x="4" y="4" width="15" height="15" rx="2" stroke="currentColor" stroke-width="1.5" />
+                            <rect x="21" y="4" width="15" height="15" rx="2" stroke="currentColor" stroke-width="1.5" />
+                            <rect x="4" y="21" width="15" height="15" rx="2" stroke="currentColor" stroke-width="1.5" />
+                            <rect x="21" y="21" width="15" height="15" rx="2" stroke="currentColor"
+                                stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <p class="empty-title">Framework not built yet</p>
+                    <p class="empty-desc">The Cypress project scaffold will appear here after test cases are generated.
+                    </p>
+                </div>
+                <div class="panel-content" id="content-1" hidden></div>
+            </div>
+
+            <!-- Panel 2: Scripts -->
+            <div class="panel" role="tabpanel" id="panel-2" aria-labelledby="tab-2" hidden>
+                <div class="empty-state" id="empty-2">
+                    <div class="empty-icon" aria-hidden="true">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <path d="M14 13L7 20l7 7M26 13l7 7-7 7M22 9L18 31" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <p class="empty-title">Scripts not generated yet</p>
+                    <p class="empty-desc">Cypress spec files will be created once the framework is in place.</p>
+                </div>
+                <div class="panel-content" id="content-2" hidden></div>
+            </div>
+
+            <!-- Panel 3: Self-Heal -->
+            <div class="panel" role="tabpanel" id="panel-3" aria-labelledby="tab-3" hidden>
+                <div class="empty-state" id="empty-3">
+                    <div class="empty-icon" aria-hidden="true">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M20 13v7l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <p class="empty-title">Self-healing analysis pending</p>
+                    <p class="empty-desc">Fragile selectors will be detected and healing chains proposed in this step.
+                    </p>
+                </div>
+                <div class="panel-content" id="content-3" hidden></div>
+            </div>
+
+        </div><!-- /panels -->
+
+        <!-- ── TC Selection Drawer ─────────────────────────────────── -->
+        <div class="tc-select-backdrop" id="tcSelectBackdrop"></div>
+
+        <div class="tc-select-drawer" id="tcSelectDrawer" aria-label="Select test cases to automate">
+
+            <div class="tc-select-header">
+                <div class="tc-select-title">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.4"
+                            stroke-linecap="round" />
+                        <circle cx="13" cy="12" r="2.5" stroke="currentColor" stroke-width="1.3" />
+                        <path d="M12 12l.8.8 1.5-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Select Test Cases to Automate
+                </div>
+                <button class="tc-select-close" id="tcSelectClose" aria-label="Close">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="tc-select-toolbar">
+                <div class="tc-select-search-wrap">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.3" />
+                        <path d="M10.5 10.5l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                    </svg>
+                    <input type="text" id="tcSearchInput" class="tc-search-input" placeholder="Search test cases…" />
+                </div>
+                <div class="tc-filter-tabs" id="tcFilterTabs">
+                    <button class="tc-filter-tab active" data-filter="all">All</button>
+                    <button class="tc-filter-tab" data-filter="UI">UI</button>
+                    <button class="tc-filter-tab" data-filter="API">API</button>
+                    <button class="tc-filter-tab" data-filter="High">High</button>
+                </div>
+            </div>
+
+            <!-- Auto-select bar -->
+            <div class="tc-auto-bar">
+                <span class="tc-auto-label">Auto-select:</span>
+                <button class="tc-auto-btn" id="autoSelectAll">All</button>
+                <button class="tc-auto-btn" id="autoSelectHigh">High Priority</button>
+                <button class="tc-auto-btn" id="autoSelectUI">UI Only</button>
+                <button class="tc-auto-btn" id="autoSelectAPI">API Only</button>
+                <button class="tc-auto-btn" id="autoSelectAI">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M8 2l1.5 3.5L13 7l-3.5 1.5L8 12l-1.5-3.5L3 7l3.5-1.5L8 2z" fill="currentColor" />
+                    </svg>
+                    AI Pick
+                </button>
+                <button class="tc-auto-btn danger" id="autoSelectNone">None</button>
+            </div>
+
+            <!-- Module tabs -->
+            <div class="tc-module-tabs" id="tcModuleTabs"></div>
+
+            <!-- TC list -->
+            <div class="tc-select-list" id="tcSelectList"></div>
+
+            <!-- Footer -->
+            <div class="tc-select-footer">
+                <div class="tc-select-stats" id="tcSelectStats">0 selected</div>
+                <div style="display:flex;gap:8px">
+                    <button class="tc-select-cancel" id="tcSelectCancel">Cancel</button>
+                    <button class="tc-select-confirm" id="tcSelectConfirm">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        Automate Selected
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ── Toast notification ──────────────────────────────────── -->
+    <div class="toast" id="toast" role="alert" aria-live="polite" hidden>
+        <span id="toastMsg"></span>
+    </div>
+
+    <!-- ── Chat drawer ──────────────────────────────────────── -->
+    <div class="chat-backdrop" id="chatBackdrop"></div>
+
+    <div class="chat-drawer" id="chatDrawer" aria-label="Bug fix chat">
+        <div class="chat-header">
+            <div class="chat-title">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M14 10a2 2 0 0 1-2 2H4l-3 3V3a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v7z" stroke="currentColor"
+                        stroke-width="1.3" stroke-linejoin="round" />
+                </svg>
+                Fix Bugs with AI
+            </div>
+            <div style="display:flex;gap:6px;align-items:center">
+                <div class="chat-context-btn">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.4"
+                            stroke-linecap="round" />
+                    </svg>
+                    Context: Framework + Scripts
+                </div>
+                <button class="chat-close" id="chatClose" aria-label="Close chat">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-welcome" id="chatWelcome">
+                <p>I have full context of your generated framework and test scripts. Describe any bug or paste an error
+                    and I'll fix the code.</p>
+                <div class="chat-suggestions">
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Fix all import errors</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Fix selector errors in
+                        auth.cy.js</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Add missing beforeEach hooks</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Fix package.json
+                        dependencies</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-wrap">
+            <textarea class="chat-input" id="chatInput" placeholder="Describe the bug or paste the error message…"
+                rows="1"></textarea>
+            <button class="chat-send" id="chatSend" aria-label="Send">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M14 2L2 7l5 2 2 5 5-12z" fill="currentColor" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Fix Bugs floating button -->
+    <button class="chat-fab" id="chatFab" title="Fix bugs with AI">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M14 10a2 2 0 0 1-2 2H4l-3 3V3a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v7z" stroke="currentColor"
+                stroke-width="1.4" stroke-linejoin="round" />
+        </svg>
+        Fix Bugs
+    </button>
+
+   <!-- ── Add Requirements Modal ──────────────────────────────── -->
+    <div class="tc-select-backdrop" id="addReqBackdrop"></div>
+    <div class="tc-select-drawer" id="addReqDrawer" aria-label="Add new requirements" style="max-width:560px">
+
+        <div class="tc-select-header">
+            <div class="tc-select-title">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                </svg>
+                Add New Requirements
+            </div>
+            <button class="tc-select-close" id="addReqClose" aria-label="Close">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+            </button>
+        </div>
+
+        <div style="padding:16px;overflow-y:auto;flex:1">
+            <p style="font-size:13px;color:var(--c-text-2,#a0a8c0);margin:0 0 12px">
+                Describe new modules/features. The agent will generate test cases, framework files, and scripts for
+                <strong>only these new items</strong> and append them to your existing run — nothing already
+                generated will be touched.
+            </p>
+
+            <div class="field">
+                <label class="field-label">New module name(s) — one per line</label>
+                <textarea id="addReqModules" class="field-input field-textarea"
+                    placeholder="Wishlist&#10;Gift Cards" style="height:60px"></textarea>
+            </div>
+
+            <div class="field">
+                <label class="field-label">New requirements document</label>
+                <input type="file" id="addReqFile" accept=".txt,.md,.pdf,.docx,.doc" hidden />
+                <div class="upload-zone" id="addReqUploadZone">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 3v12M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="upload-label" id="addReqUploadLabel">Click to upload or drag & drop</span>
+                    <span class="upload-hint">.txt .md .pdf .docx</span>
+                </div>
+                <div class="upload-info" id="addReqUploadInfo" hidden>
+                    <span id="addReqFileName"></span>
+                    <button class="upload-clear" id="addReqUploadClear" aria-label="Remove file">✕</button>
+                </div>
+                <textarea id="addReqText" class="field-input field-textarea"
+                    placeholder="Or paste the new requirements text here…" style="margin-top:8px"></textarea>
+            </div>
+        </div>
+
+        <div class="tc-select-footer">
+            <div class="tc-select-stats" id="addReqStats"></div>
+            <div style="display:flex;gap:8px">
+                <button class="tc-select-cancel" id="addReqCancel">Cancel</button>
+                <button class="tc-select-confirm" id="addReqConfirm">
+                    <svg class="run-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M5 3l8 5-8 5V3z" fill="currentColor" />
+                    </svg>
+                    <svg class="spin-icon" width="14" height="14" viewBox="0 0 16 16" fill="none"
+                        aria-hidden="true" style="display:none">
+                        <path d="M8 2a6 6 0 1 0 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                    <span class="run-label">Generate & Append</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast" role="alert" aria-live="polite" hidden>
+        <span id="toastMsg"></span>
+    </div>
+
+    <script src="renderer.js"></script>
+
+
+</body>
+
+</html>
